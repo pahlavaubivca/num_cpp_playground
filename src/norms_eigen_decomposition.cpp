@@ -8,6 +8,8 @@ using namespace std;
 using namespace nc;
 
 namespace NormAndEigenDecomposition {
+    Eigen::MatrixXf convert_to_eigen_matrix(NdArray<int> arr);
+
     void eigenDecomposition() {
         //Av=lamda v
     }
@@ -16,10 +18,14 @@ namespace NormAndEigenDecomposition {
         cout << "find eigen vv, original matrix:" << arr << endl;
         auto diagonal = diag(arr);
         cout << "find eigen vv diagonal:" << diagonal << endl;
-        Eigen::EigenSolver<Eigen::MatrixXf> eigensolver;
-        Eigen::MatrixXi:: eArr = {{1,2,3},{4,5,6},{7,8,9}};
-        eigensolver.compute(arr);
-        auto eigenvalues = Eigen::ComplexEigenSolver.eigenvalues()
+
+        Eigen::MatrixXf eArr = convert_to_eigen_matrix(arr);// = {{1,2,3},{4,5,6},{7,8,9}};
+        Eigen::SelfAdjointEigenSolver<Eigen::MatrixXf> eigensolver;//(eArr);//(eArr);
+        eigensolver.compute(eArr);
+        auto eValues = eigensolver.eigenvalues();
+        auto eVector = eigensolver.eigenvectors();
+        cout << "eigen values:" << eValues << endl << "eigen vector:" << eVector << endl;
+
     }
 
     void playWithNorms() {
@@ -41,8 +47,23 @@ namespace NormAndEigenDecomposition {
     }
 
     void neDecompostion::run() {
-        NdArray<int> forFindEValues = arange<int>(5);//.reshape(3,3);
-
+        NdArray<int> forFindEValues = arange<int>(9).reshape(3, 3);
         playWithEigenVectorAndValues(forFindEValues);
+    }
+
+    //todo check why eigen decomposition do not as expected with int but with float only
+    Eigen::MatrixXf convert_to_eigen_matrix(NdArray<int> arr) {
+        int rows = arr.numRows();
+        int cols = arr.size() / rows;
+        Eigen::MatrixXf result(rows, cols  );
+        int getIndex = 0;
+        for (int j = 0; j < rows; j++) {
+            for (int i = 0; i < cols; i++) {
+                float value = static_cast<float>(arr[getIndex++]);
+                result(j, i) = value;
+            }
+        }
+        cout << result << endl;
+        return result;
     }
 }
